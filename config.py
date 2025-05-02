@@ -1,3 +1,5 @@
+#! /usr/bin/python3.12
+
 import os
 from types import MappingProxyType
 
@@ -17,5 +19,8 @@ def __init__():
                 continue
             l_config[line[:idx].strip()] = line[idx + 1:].strip()
     return MappingProxyType(l_config)
+
+def get_root_path():
+    return config_view['collect_file_root']
 
 config_view = __init__()
