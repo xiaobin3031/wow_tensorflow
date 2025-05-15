@@ -13,14 +13,15 @@ def build_and_train_crnn_model(img_width, img_height):
     """
     model_file = "ocr_model.h5"
     if os.path.exists(model_file):
-        use_old_model = input("模型文件已存在，是否直接使用(Y)").strip()
-        if use_old_model == 'Y':
-            return keras.models.load_model(model_file)
+        if input("模型文件已存在，是否加载(Y)").strip() == 'Y':
+            model = keras.models.load_model(model_file)
+            if input('模型已加载，是否直接使用(Y)').trip() == 'Y':
+                return model
 
     # 加载图片
     dataset, total_count, num_classes = ocr_data_load.load_label_file()
     split_index = int(0.8 * total_count)
-    train_ds = dataset.take(split_index).shuffle(buffer_size=split_index, reshuffle_each_iteration=True).repeat().batch(32).prefetch(tf.data.AUTOTUNE)
+    train_ds = dataset.take(split_index).shuffle(1000).repeat().batch(32).prefetch(tf.data.AUTOTUNE)
     val_ds = dataset.skip(split_index).batch(32).prefetch(tf.data.AUTOTUNE)
 
     print('model.init')
@@ -49,16 +50,14 @@ def build_and_train_crnn_model(img_width, img_height):
     model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=['accuracy'])
 
     print('model.fit')
-    to_train = input('是否开始训练(Y)').strip()
-    if to_train != 'Y':
+    if input('是否开始训练(Y)').strip() != 'Y':
         return
     steps_per_epochs = split_index // 32
     model.fit(train_ds, validation_data = val_ds, epochs=100, 
               steps_per_epoch = steps_per_epochs, validation_steps = (total_count - split_index) // 32)
 
-    save_model = input('是否保存模型(Y)').strip()
-    if save_model != 'Y':
-        return
+    if input('是否保存模型(Y)').strip() != 'Y':
+        return model
 
     print('model.save')
     if os.path.exists(model_file):
@@ -68,6 +67,19 @@ def build_and_train_crnn_model(img_width, img_height):
     print('model.end')
     return model
 
+def predict_model(model):
+    while True:
+        image_path = input('请输入图片地址(q to exit): \n').strip()
+        if image_path == 'q':
+            break
+        if not os.path.exists(image_path):
+            print('图片不存在')
+            continue
+        image, _ = ocr_data_load.decode_image(image_path, '')
+
 sleep(1)
 size = config.ocr_img_size()
-build_and_train_crnn_model(size, size)
+ocr_model = build_and_train_crnn_model(size, size)
+if ocr_model is not None:
+    # 不为空，开始识别
+    predict_model(ocr_model)

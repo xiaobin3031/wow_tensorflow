@@ -34,6 +34,7 @@ def load_label_file():
 
     dataset = tf.data.Dataset.from_tensor_slices((filenames, label_indices))
     dataset = dataset.map(decode_image)
+    dataset = dataset.shuffle(buffer_size = 1000)
     
     idx2char = {i: ch for ch, i in char2idx.items()}
     with open(idx2char_file, 'w', encoding='utf-8') as f:

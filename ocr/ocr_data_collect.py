@@ -7,7 +7,9 @@ cur_dir = os.path.dirname(__file__)
 font = ImageFont.truetype(os.path.join(cur_dir, 'SourceHanSerifSC-Light.otf'), 20)
 image_path = os.path.join(config.get_root_path(), 'ocr_datas', 'images')
 if os.path.exists(image_path):
+    print(f'begin clear {image_path}')
     shutil.rmtree(image_path)
+    print(f'clear {image_path} success')
 os.makedirs(image_path, exist_ok=True)
 charset_file = os.path.join(config.get_root_path(), 'ocr_datas', 'charset.txt')
 
@@ -55,8 +57,19 @@ def generate_char_image(ch):
     draw.text((x, y), ch, font=font, fill='black')
 
     # 可选：轻度模糊 / 旋转
-    if random.random() < 0.2:
+    if random.random() < 0.35:
         image = image.filter(ImageFilter.GaussianBlur(radius=0.5))
+
+    # 旋转
+    if random.random() < 0.35:
+        angle = random.randint(-15, 15)
+        image = image.rotate(angle, expand=True, fillcolor=255)
+
+    if random.random() < 0.1:
+        if random.random() < 0.5:
+            image = image.resize((int(size / 2), int(size / 2)), resample = Image.Resampling.LANCZOS)
+        else:
+            image = image.resize((size * 2, size * 2), resample = Image.Resampling.LANCZOS)
 
     return image
 
