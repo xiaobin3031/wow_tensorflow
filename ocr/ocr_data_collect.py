@@ -4,7 +4,6 @@ import os, config, openpyxl, shutil, random
 from PIL import Image, ImageDraw, ImageFont,ImageFilter
 
 cur_dir = os.path.dirname(__file__)
-font = ImageFont.truetype(os.path.join(cur_dir, 'SourceHanSerifSC-Light.otf'), 20)
 image_path = os.path.join(config.get_root_path(), 'ocr_datas', 'images')
 if os.path.exists(image_path):
     print(f'begin clear {image_path}')
@@ -14,6 +13,16 @@ os.makedirs(image_path, exist_ok=True)
 charset_file = os.path.join(config.get_root_path(), 'ocr_datas', 'charset.txt')
 
 samples_per_char = 20
+
+def load_fonts():
+    font_path = os.path.join(cur_dir, 'fonts')
+    fonts = []
+    for f_file in os.listdir(font_path):
+        font = ImageFont.truetype(os.path.join(font_path, f_file), 20)
+        fonts.append(font)
+    return fonts
+
+fonts = load_fonts()
 
 def load_ori_datas():
     """
@@ -38,7 +47,7 @@ def load_ori_datas():
         for ch in charsets:
             w_file.write(ch + '\n')
 
-def generate_char_image(ch):
+def generate_char_image(ch, font):
     """
     根据文字创建图片，png
     :param ch 文字
@@ -80,11 +89,12 @@ def create_image(ch, charsets):
     :param ch 文字
     """
     for i in range(samples_per_char):
-        img = generate_char_image(ch)
-        filename = f"{ch}_{i}.png"
-        path = os.path.join(image_path, filename)
-        img.save(path)
-        charsets.append(f"{filename}\t{ch}")
+        for font in fonts:
+            img = generate_char_image(ch, font)
+            filename = f"{ch}_{i}.png"
+            path = os.path.join(image_path, filename)
+            img.save(path)
+            charsets.append(f"{filename}\t{ch}")
 
 print(os.path.basename(__file__))
 load_ori_datas()
