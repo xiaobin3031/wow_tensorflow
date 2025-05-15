@@ -12,7 +12,7 @@ if os.path.exists(image_path):
 os.makedirs(image_path, exist_ok=True)
 charset_file = os.path.join(config.get_root_path(), 'ocr_datas', 'charset.txt')
 
-samples_per_char = 20
+samples_per_char = 10
 
 def load_fonts():
     font_path = os.path.join(cur_dir, 'fonts')
@@ -66,15 +66,16 @@ def generate_char_image(ch, font):
     draw.text((x, y), ch, font=font, fill='black')
 
     # 可选：轻度模糊 / 旋转
-    if random.random() < 0.35:
+    if random.random() < 0.5:
         image = image.filter(ImageFilter.GaussianBlur(radius=0.5))
 
     # 旋转
-    if random.random() < 0.35:
-        angle = random.randint(-15, 15)
+    if random.random() < 0.5:
+        angle = random.randint(-30, 30)
         image = image.rotate(angle, expand=True, fillcolor=255)
 
-    if random.random() < 0.1:
+    # 缩放
+    if random.random() < 0.3:
         if random.random() < 0.5:
             image = image.resize((int(size / 2), int(size / 2)), resample = Image.Resampling.LANCZOS)
         else:
@@ -88,7 +89,8 @@ def create_image(ch, charsets):
     根据文字创建图片，png
     :param ch 文字
     """
-    for i in range(samples_per_char):
+    max_count = samples_per_char * len(fonts)
+    for i in range(max_count):
         for font in fonts:
             img = generate_char_image(ch, font)
             filename = f"{ch}_{i}.png"
