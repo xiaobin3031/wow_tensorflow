@@ -1,4 +1,5 @@
 #! /usr/bin/bash
+env_name=wow
 
 if [ $# == 0 ]; then
 	echo "please input filename"
@@ -11,15 +12,11 @@ if [ ! -f $file ]; then
 	exit 0
 fi
 
-pkg_path=~/.local/lib/python3.8/site-packages
-P_PATH=""
-for dir in $pkg_path/*; do
-	if [ -d "$dir" ]; then
-		P_PATH="$P_PATH:$dir"
-	fi
-done
+# change env
+source /root/p_envs/$env_name/bin/activate
+
 exec_file=${0}
 path=`dirname $(realpath $exec_file)`
 export PYTHONPATH="$PYTHONPATH:$path"
 
-python3.12 $file
+python3 $file
