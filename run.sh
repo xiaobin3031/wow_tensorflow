@@ -19,4 +19,5 @@ exec_file=${0}
 path=`dirname $(realpath $exec_file)`
 export PYTHONPATH="$PYTHONPATH:$path"
 
+clear
 python3 $file

@@ -1,7 +1,8 @@
 # coding=utf-8
 
-import config, os, json
+import config, os, json, cv2
 import tensorflow as tf
+import numpy as np
 
 ocr_data_dir = os.path.join(config.get_root_path(), 'ocr_datas')
 size = config.ocr_img_size()
@@ -33,8 +34,7 @@ def load_label_file():
     label_indices = [char2idx[ch] for ch in labels]
 
     dataset = tf.data.Dataset.from_tensor_slices((filenames, label_indices))
-    dataset = dataset.map(decode_image)
-    dataset = dataset.shuffle(buffer_size = 1000)
+    dataset = dataset.map(decode_image).shuffle(buffer_size = 10000)
     
     idx2char = {i: ch for ch, i in char2idx.items()}
     with open(idx2char_file, 'w', encoding='utf-8') as f:

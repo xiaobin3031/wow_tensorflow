@@ -43,6 +43,9 @@ def set_by_system(config, key, value):
 def get_root_path():
     return config_view['collect_file_root']
 
+def model_path():
+    return config_view['model_path']
+
 def ocr_img_size():
     return int(config_view['ocr_img_size'])
 
